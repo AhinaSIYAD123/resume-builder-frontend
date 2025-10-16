@@ -11,7 +11,8 @@ import TextareaAutosize from "@mui/material/TextareaAutosize";
 import Swal from "sweetalert2";
 
 import { CiCircleRemove } from "react-icons/ci"; 
-import { addResumeAPI } from "../services/allAPIs";
+import { addResumeAPI } from "../Services/allAPIs";
+
 
 
 const steps = [
