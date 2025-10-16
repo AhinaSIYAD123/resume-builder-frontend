@@ -2,8 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
 import { MdDelete } from "react-icons/md";
-import { deleteHistoryAPI, getHistoryAPI } from '../Services/allAPIs';
-
+import { deleteHistoryAPI, getHistoryAPI } from '../Services/allAPIs'; 
 
 function History() {
   const [resume, setResume] = useState([]);
@@ -11,17 +10,17 @@ function History() {
   const getHistory = async () => {
     try {
       const response = await getHistoryAPI();
-      console.log(response);
-      setResume(response); 
+      setResume(response.data || []); // ✅ ensure array
     } catch (err) {
-      console.log(err);
+      console.error("Error fetching history:", err);
     }
   };
 
-  const deleteHistory = async (id) => {
+  const deleteHistoryItem = async (id) => {
+    if (!window.confirm("Are you sure you want to delete this resume?")) return;
+
     try {
-      const response = await deleteHistoryAPI(id);
-      console.log(response);
+      await deleteHistoryAPI(id);
       alert("Deleted...");
       getHistory(); 
     } catch (err) {
@@ -34,15 +33,15 @@ function History() {
   }, []);
 
   return (
-    <div>
+    <div style={{ padding: '20px' }}>
       <h1>Download Resume Details</h1>
-      <div className="row">
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '15px' }}>
         {resume.length > 0 ? (
           resume.map((item) => (
-            <div className="col" key={item.id} style={{ marginBottom: '15px' }}>
+            <div key={item.id} style={{ width: 350 }}>
               <Stack direction="row" justifyContent="space-between" alignItems="center">
-                <span>Review at: {item.formattedDateTime}</span>
-                <span style={{ cursor: 'pointer' }} onClick={() => deleteHistory(item.id)}>
+                <span>Reviewed at: {item.formattedDateTime}</span>
+                <span style={{ cursor: 'pointer' }} onClick={() => deleteHistoryItem(item.id)}>
                   <MdDelete color="red" />
                 </span>
               </Stack>
