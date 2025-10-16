@@ -2,7 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { Box, Button, Tooltip, Stack, TextField, TextareaAutosize, Modal, IconButton } from '@mui/material';
 import { MdEditDocument } from "react-icons/md";
 import { IoIosCloseCircle } from "react-icons/io";
-import { updateResumeAPI, addHistoryAPI } from "../../services/allAPIs";
+import { addHistoryAPI, updateResumeAPI } from '../Services/allAPIs';
+
 
 
 const style = {
