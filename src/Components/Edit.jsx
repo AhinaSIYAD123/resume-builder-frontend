@@ -1,10 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import { Box, Button, Tooltip, Stack, TextField, TextareaAutosize, Modal, IconButton } from '@mui/material';
+import { 
+  Box, Button, Tooltip, Stack, TextField, TextareaAutosize, Modal, IconButton 
+} from '@mui/material';
 import { MdEditDocument } from "react-icons/md";
 import { IoIosCloseCircle } from "react-icons/io";
-import { addHistoryAPI, updateResumeAPI } from '../Services/allAPIs';
-
-
+import { 
+  addResumeAPI, 
+  getResumeHistoryAPI, 
+  addHistoryAPI, 
+  updateResumeAPI 
+} from '../Services/allAPIs'; 
 
 const style = {
   position: 'absolute',
@@ -23,7 +28,7 @@ const style = {
 function Edit({ resumeId, resumeData, setResumeData, setResumeId }) {
   const [resumeHistory, setResumeHistory] = useState({
     personalDetails: {},
-   contactDetails: {},
+    contactDetails: {},
     educationDetails: {},
     workExperience: {},
     skills: [],
@@ -37,7 +42,7 @@ function Edit({ resumeId, resumeData, setResumeData, setResumeId }) {
 
   const suggestions = ['React', 'Angular', 'Node', 'Express', 'MongoDB', 'JavaScript', 'HTML', 'CSS', 'C++'];
 
- 
+  // Fetch a particular resume
   const getAResume = async (id) => {
     if (id) {
       try {
@@ -121,81 +126,21 @@ function Edit({ resumeId, resumeData, setResumeData, setResumeId }) {
           {/* Contact Details */}
           <Stack spacing={2} sx={{ mb: 3 }}>
             <h5>Contact Details</h5>
-         <TextField
-  placeholder="Email"
-  variant="standard"
-  value={resumeHistory.contactDetails?.email || ""}
-  onChange={e =>
-    setResumeHistory({
-      ...resumeHistory,
-      contactDetails: {
-        ...resumeHistory.contactDetails,
-        email: e.target.value
-      }
-    })
-  }
-/>
-
-<TextField
-  placeholder="Phone Number"
-  variant="standard"
-  value={resumeHistory.contactDetails?.phoneNumber || ""}
-  onChange={e =>
-    setResumeHistory({
-      ...resumeHistory,
-      contactDetails: {
-        ...resumeHistory.contactDetails,
-        phoneNumber: e.target.value
-      }
-    })
-  }
-/>
-
-<TextField
-  placeholder="Github"
-  variant="standard"
-  value={resumeHistory.contactDetails?.github || ""}
-  onChange={e =>
-    setResumeHistory({
-      ...resumeHistory,
-      contactDetails: {
-        ...resumeHistory.contactDetails,
-        github: e.target.value
-      }
-    })
-  }
-/>
-
-<TextField
-  placeholder="LinkedIn"
-  variant="standard"
-  value={resumeHistory.contactDetails?.linkedIn || ""}
-  onChange={e =>
-    setResumeHistory({
-      ...resumeHistory,
-      contactDetails: {
-        ...resumeHistory.contactDetails,
-        linkedIn: e.target.value
-      }
-    })
-  }
-/>
-
-<TextField
-  placeholder="Portfolio"
-  variant="standard"
-  value={resumeHistory.contactDetails?.portfolio || ""}
-  onChange={e =>
-    setResumeHistory({
-      ...resumeHistory,
-      contactDetails: {
-        ...resumeHistory.contactDetails,
-        portfolio: e.target.value
-      }
-    })
-  }
-/>
-
+            <TextField placeholder="Email" variant="standard" value={resumeHistory.contactDetails?.email || ""} 
+              onChange={e => setResumeHistory({ ...resumeHistory, contactDetails: { ...resumeHistory.contactDetails, email: e.target.value } })} 
+            />
+            <TextField placeholder="Phone Number" variant="standard" value={resumeHistory.contactDetails?.phoneNumber || ""} 
+              onChange={e => setResumeHistory({ ...resumeHistory, contactDetails: { ...resumeHistory.contactDetails, phoneNumber: e.target.value } })} 
+            />
+            <TextField placeholder="Github" variant="standard" value={resumeHistory.contactDetails?.github || ""} 
+              onChange={e => setResumeHistory({ ...resumeHistory, contactDetails: { ...resumeHistory.contactDetails, github: e.target.value } })} 
+            />
+            <TextField placeholder="LinkedIn" variant="standard" value={resumeHistory.contactDetails?.linkedIn || ""} 
+              onChange={e => setResumeHistory({ ...resumeHistory, contactDetails: { ...resumeHistory.contactDetails, linkedIn: e.target.value } })} 
+            />
+            <TextField placeholder="Portfolio" variant="standard" value={resumeHistory.contactDetails?.portfolio || ""} 
+              onChange={e => setResumeHistory({ ...resumeHistory, contactDetails: { ...resumeHistory.contactDetails, portfolio: e.target.value } })} 
+            />
           </Stack>
 
           {/* Education Details */}
