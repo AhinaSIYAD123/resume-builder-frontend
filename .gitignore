@@ -7,18 +7,50 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-node_modules
-dist
-dist-ssr
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Node modules and build output
+node_modules/
+dist/
+dist-ssr/
+.build/
+.cache/
+
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Local configuration files
 *.local
+
+# TypeScript
+*.tsbuildinfo
 
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
-.idea
+.idea/
 .DS_Store
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Optional: Mac OS files
+.AppleDouble
+.LSOverride
+
+# Optional: npm package logs and locks (if not committed)
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+
+# Optional: Next.js specific
+.next/
+out/

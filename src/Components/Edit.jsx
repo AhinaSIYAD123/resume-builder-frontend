@@ -1,19 +1,16 @@
-import React from 'react';
-import Button from '@mui/material/Button';
-import { CiEdit } from 'react-icons/ci';
-import Box from '@mui/material/Box';
-import Typography from '@mui/material/Typography';
-import Modal from '@mui/material/Modal';
-import TextField from '@mui/material/TextField';
-import Stack from '@mui/material/Stack';
+import React, { useEffect, useState } from 'react';
+import { Box, Button, Tooltip, Stack, TextField, TextareaAutosize, Modal, IconButton } from '@mui/material';
+import { MdEditDocument } from "react-icons/md";
+import { IoIosCloseCircle } from "react-icons/io";
+import { getResumeHistoryAPI, updateResumeAPI, addResumeAPI } from '../services/allAPIs';
 
-const modalStyle = {
+const style = {
   position: 'absolute',
   top: '50%',
   left: '50%',
   transform: 'translate(-50%, -50%)',
-  width: 600,
-  maxHeight: '90vh',
+  width: 700,
+  maxHeight: '80vh',
   overflowY: 'auto',
   bgcolor: 'background.paper',
   border: '2px solid #000',
@@ -21,107 +18,260 @@ const modalStyle = {
   p: 4,
 };
 
-export default function Edit() {
-  const [open, setOpen] = React.useState(false);
-  const [formData, setFormData] = React.useState({
-    fullName: '',
-    jobTitle: '',
-    location: '',
-    Email: '',
-    PhoneNumber: '',
-    GitHubLink: '',
-    LinkdnLink: '',
-    PortfolioLink: '',
-    CourseName: '',
-    CollegeName: '',
-    University: '',
-    YearOfPassOut: '',
-    job: '',
-    CompanyName: '',
-    WorkLocation: '',
-    Duration: '',
-    AddSkills: '',
-    Summary: '',
+function Edit({ resumeId, resumeData, setResumeData, setResumeId }) {
+  const [resumeHistory, setResumeHistory] = useState({
+    personalDetails: {},
+   contactDetails: {},
+    educationDetails: {},
+    workExperience: {},
+    skills: [],
+    summary: ""
   });
+  const [open, setOpen] = useState(false);
+  const [userSkills, setUserSkills] = useState("");
 
   const handleOpen = () => setOpen(true);
   const handleClose = () => setOpen(false);
 
-  const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+  const suggestions = ['React', 'Angular', 'Node', 'Express', 'MongoDB', 'JavaScript', 'HTML', 'CSS', 'C++'];
+
+ 
+  const getAResume = async (id) => {
+    if (id) {
+      try {
+        const response = await getResumeHistoryAPI(id);
+        setResumeHistory(response.data || resumeData);
+      } catch (err) {
+        console.log("Error fetching resume:", err);
+        setResumeHistory(resumeData);
+      }
+    } else {
+      setResumeHistory(resumeData);
+    }
+  };
+
+  useEffect(() => {
+    getAResume(resumeId);
+  }, [resumeId, resumeData]);
+
+  const addSkill = (skill) => {
+    if (!skill) return;
+    if (resumeHistory.skills.includes(skill)) {
+      alert("Skill already added");
+      return;
+    }
+    setResumeHistory({ ...resumeHistory, skills: [...resumeHistory.skills, skill] });
+    setUserSkills("");
+  };
+
+  const removeSkill = (skill) => {
+    setResumeHistory({
+      ...resumeHistory,
+      skills: resumeHistory.skills.filter(s => s !== skill)
+    });
+  };
+
+  const handleUpdate = async () => {
+    try {
+      console.log("Sending Resume Data:", resumeId, resumeHistory);
+
+      let response;
+      if (resumeId) {
+        // Update existing resume
+        response = await updateResumeAPI(resumeId, resumeHistory);
+      } else {
+        // Create new resume
+        response = await addResumeAPI(resumeHistory);
+        if (response?.data?.id) {
+          setResumeId(response.data.id); // save new ID
+        }
+      }
+
+      setResumeData(response?.data || resumeHistory);
+      handleClose();
+    } catch (err) {
+      console.log("Update error:", err);
+    }
   };
 
   return (
     <div>
-      <Button onClick={handleOpen} variant="outlined" startIcon={<CiEdit />}>
-        Edit
-      </Button>
+      <Tooltip title="Edit">
+        <Button variant="text" onClick={handleOpen}><MdEditDocument /></Button>
+      </Tooltip>
 
       <Modal open={open} onClose={handleClose}>
-        <Box sx={modalStyle}>
-          <Typography variant="h5" sx={{ mb: 2 }} align="center">
-            Edit Resume
-          </Typography>
-
-          <Typography variant="h6" sx={{ mt: 2 }}>Personal Details</Typography>
-          <TextField label="Full Name" name="fullName" value={formData.fullName} onChange={handleChange} fullWidth margin="normal" />
-          <TextField label="Job Title" name="jobTitle" value={formData.jobTitle} onChange={handleChange} fullWidth margin="normal" />
-          <TextField label="Location" name="location" value={formData.location} onChange={handleChange} fullWidth margin="normal" />
-
-     
-          <Typography variant="h6" sx={{ mt: 2 }}>Contact Details</Typography>
-          <TextField label="Email" name="Email" value={formData.Email} onChange={handleChange} fullWidth margin="normal" />
-          <TextField label="Phone Number" name="PhoneNumber" value={formData.PhoneNumber} onChange={handleChange} fullWidth margin="normal" />
-          <TextField label="GitHub Link" name="GitHubLink" value={formData.GitHubLink} onChange={handleChange} fullWidth margin="normal" />
-          <TextField label="LinkedIn Link" name="LinkdnLink" value={formData.LinkdnLink} onChange={handleChange} fullWidth margin="normal" />
-          <TextField label="Portfolio Link" name="PortfolioLink" value={formData.PortfolioLink} onChange={handleChange} fullWidth margin="normal" />
-
-        
-          <Typography variant="h6" sx={{ mt: 2 }}>Education Details</Typography>
-          <TextField label="Course Name" name="CourseName" value={formData.CourseName} onChange={handleChange} fullWidth margin="normal" />
-          <TextField label="College Name" name="CollegeName" value={formData.CollegeName} onChange={handleChange} fullWidth margin="normal" />
-          <TextField label="University" name="University" value={formData.University} onChange={handleChange} fullWidth margin="normal" />
-          <TextField label="Year Of Pass Out" name="YearOfPassOut" value={formData.YearOfPassOut} onChange={handleChange} fullWidth margin="normal" />
-
-    
-          <Typography variant="h6" sx={{ mt: 2 }}>Work Experience</Typography>
-          <TextField label="Job or Internship" name="job" value={formData.job} onChange={handleChange} fullWidth margin="normal" />
-          <TextField label="Company Name" name="CompanyName" value={formData.CompanyName} onChange={handleChange} fullWidth margin="normal" />
-          <TextField label="Work Location" name="WorkLocation" value={formData.WorkLocation} onChange={handleChange} fullWidth margin="normal" />
-          <TextField label="Duration" name="Duration" value={formData.Duration} onChange={handleChange} fullWidth margin="normal" />
-
-          <Typography variant="h6" sx={{ mt: 2 }}>Skills</Typography>
-          <TextField label="Add Skill" name="AddSkills" value={formData.AddSkills} onChange={handleChange} fullWidth margin="normal" />
-          <Stack direction="row" flexWrap="wrap" spacing={1} sx={{ mt: 1 }}>
-            {['React', 'Node.js', 'Express', 'MongoDB', 'TypeScript', 'Python', 'C++'].map(skill => (
-              <Button key={skill} variant="outlined">{skill}</Button>
-            ))}
+        <Box sx={style}>
+          {/* Personal Details */}
+          <Stack spacing={2} sx={{ mb: 3 }}>
+            <h5>Personal Details</h5>
+            <TextField placeholder="Full Name" variant="standard" value={resumeHistory?.personalDetails?.fullName || ""} 
+              onChange={e => setResumeHistory({ ...resumeHistory, personalDetails: { ...resumeHistory.personalDetails, fullName: e.target.value } })} 
+            />
+            <TextField placeholder="Job Title" variant="standard" value={resumeHistory?.personalDetails?.jobTitle || ""} 
+              onChange={e => setResumeHistory({ ...resumeHistory, personalDetails: { ...resumeHistory.personalDetails, jobTitle: e.target.value } })} 
+            />
+            <TextField placeholder="Location" variant="standard" value={resumeHistory?.personalDetails?.location || ""} 
+              onChange={e => setResumeHistory({ ...resumeHistory, personalDetails: { ...resumeHistory.personalDetails, location: e.target.value } })} 
+            />
           </Stack>
 
-     
-          <Typography variant="h6" sx={{ mt: 2 }}>Professional Summary</Typography>
-          <TextField
-            label="Summary"
-            name="Summary"
-            value={formData.Summary}
-            onChange={handleChange}
-            multiline
-            rows={6}
-            fullWidth
-            margin="normal"
-          />
+          {/* Contact Details */}
+          <Stack spacing={2} sx={{ mb: 3 }}>
+            <h5>Contact Details</h5>
+         <TextField
+  placeholder="Email"
+  variant="standard"
+  value={resumeHistory.contactDetails?.email || ""}
+  onChange={e =>
+    setResumeHistory({
+      ...resumeHistory,
+      contactDetails: {
+        ...resumeHistory.contactDetails,
+        email: e.target.value
+      }
+    })
+  }
+/>
 
-       
-          <Stack direction="row" spacing={2} justifyContent="flex-end" sx={{ mt: 3 }}>
-            <Button variant="contained" color="primary" onClick={() => { alert('Form submitted!'); handleClose(); }}>
-              Save
-            </Button>
-            <Button variant="outlined" color="secondary" onClick={handleClose}>
-              Cancel
-            </Button>
+<TextField
+  placeholder="Phone Number"
+  variant="standard"
+  value={resumeHistory.contactDetails?.phoneNumber || ""}
+  onChange={e =>
+    setResumeHistory({
+      ...resumeHistory,
+      contactDetails: {
+        ...resumeHistory.contactDetails,
+        phoneNumber: e.target.value
+      }
+    })
+  }
+/>
+
+<TextField
+  placeholder="Github"
+  variant="standard"
+  value={resumeHistory.contactDetails?.github || ""}
+  onChange={e =>
+    setResumeHistory({
+      ...resumeHistory,
+      contactDetails: {
+        ...resumeHistory.contactDetails,
+        github: e.target.value
+      }
+    })
+  }
+/>
+
+<TextField
+  placeholder="LinkedIn"
+  variant="standard"
+  value={resumeHistory.contactDetails?.linkedIn || ""}
+  onChange={e =>
+    setResumeHistory({
+      ...resumeHistory,
+      contactDetails: {
+        ...resumeHistory.contactDetails,
+        linkedIn: e.target.value
+      }
+    })
+  }
+/>
+
+<TextField
+  placeholder="Portfolio"
+  variant="standard"
+  value={resumeHistory.contactDetails?.portfolio || ""}
+  onChange={e =>
+    setResumeHistory({
+      ...resumeHistory,
+      contactDetails: {
+        ...resumeHistory.contactDetails,
+        portfolio: e.target.value
+      }
+    })
+  }
+/>
+
           </Stack>
+
+          {/* Education Details */}
+          <Stack spacing={2} sx={{ mb: 3 }}>
+            <h5>Education Details</h5>
+            <TextField placeholder="Course" variant="standard" value={resumeHistory?.educationDetails?.course || ""} 
+              onChange={e => setResumeHistory({ ...resumeHistory, educationDetails: { ...resumeHistory.educationDetails, course: e.target.value } })} 
+            />
+            <TextField placeholder="College" variant="standard" value={resumeHistory?.educationDetails?.college || ""} 
+              onChange={e => setResumeHistory({ ...resumeHistory, educationDetails: { ...resumeHistory.educationDetails, college: e.target.value } })} 
+            />
+            <TextField placeholder="University" variant="standard" value={resumeHistory?.educationDetails?.university || ""} 
+              onChange={e => setResumeHistory({ ...resumeHistory, educationDetails: { ...resumeHistory.educationDetails, university: e.target.value } })} 
+            />
+            <TextField placeholder="Year of Passout" variant="standard" value={resumeHistory?.educationDetails?.passout || ""} 
+              onChange={e => setResumeHistory({ ...resumeHistory, educationDetails: { ...resumeHistory.educationDetails, passout: e.target.value } })} 
+            />
+          </Stack>
+
+          {/* Work Experience */}
+          <Stack spacing={2} sx={{ mb: 3 }}>
+            <h5>Work Experience</h5>
+            <TextField placeholder="Job Title" variant="standard" value={resumeHistory?.workExperience?.jobTitle || ""} 
+              onChange={e => setResumeHistory({ ...resumeHistory, workExperience: { ...resumeHistory.workExperience, jobTitle: e.target.value } })} 
+            />
+            <TextField placeholder="Company" variant="standard" value={resumeHistory?.workExperience?.company || ""} 
+              onChange={e => setResumeHistory({ ...resumeHistory, workExperience: { ...resumeHistory.workExperience, company: e.target.value } })} 
+            />
+            <TextField placeholder="Location" variant="standard" value={resumeHistory?.workExperience?.location || ""} 
+              onChange={e => setResumeHistory({ ...resumeHistory, workExperience: { ...resumeHistory.workExperience, location: e.target.value } })} 
+            />
+            <TextField placeholder="Duration" variant="standard" value={resumeHistory?.workExperience?.duration || ""} 
+              onChange={e => setResumeHistory({ ...resumeHistory, workExperience: { ...resumeHistory.workExperience, duration: e.target.value } })} 
+            />
+          </Stack>
+
+          {/* Skills */}
+          <Stack spacing={2} sx={{ mb: 3 }}>
+            <h5>Skills</h5>
+            <Stack direction="row" spacing={1}>
+              <TextField placeholder="Add Skill" variant="standard" value={userSkills} 
+                onChange={e => setUserSkills(e.target.value)} 
+              />
+              <Button onClick={() => addSkill(userSkills)} variant="contained">Add</Button>
+            </Stack>
+            <Stack direction="row" spacing={1} flexWrap="wrap">
+              {resumeHistory.skills.map((skill, i) => (
+                <Button key={i} variant="outlined" size="small" sx={{ textTransform: "none" }}>
+                  {skill}
+                  <IconButton size="small" color="error" onClick={() => removeSkill(skill)}>
+                    <IoIosCloseCircle />
+                  </IconButton>
+                </Button>
+              ))}
+            </Stack>
+            <Stack direction="row" spacing={1} flexWrap="wrap">
+              {suggestions.map((s, i) => (
+                <Button key={i} variant="outlined" size="small" onClick={() => addSkill(s)}>{s}</Button>
+              ))}
+            </Stack>
+          </Stack>
+
+          {/* Summary */}
+          <Stack spacing={2} sx={{ mb: 3 }}>
+            <h5>Summary</h5>
+            <TextareaAutosize
+              value={resumeHistory.summary || ""}
+              onChange={e => setResumeHistory({ ...resumeHistory, summary: e.target.value })}
+              minRows={5}
+              style={{ width: '100%' }}
+            />
+          </Stack>
+
+          <Button variant="contained" onClick={handleUpdate}>Update</Button>
         </Box>
       </Modal>
     </div>
   );
 }
+
+export default Edit;
