@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import Stack from '@mui/material/Stack';
 import Paper from '@mui/material/Paper';
 import { MdDelete } from "react-icons/md";
-import { deleteHistoryAPI, getHistoryAPI } from '../services/allAPIs';
+import { deleteHistoryAPI, getHistoryAPI } from '../Services/allAPIs';
 
 
 function History() {
